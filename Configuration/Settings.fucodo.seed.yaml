@@ -1,0 +1,9 @@
+# fucodo:
+#   seed:
+#     jobs:
+#       default:
+#         enabled: true
+#         databaseImports:
+#           100:
+#             file: 'resource://fucodo.seed/Seed/000-examplefile.sql'
+#

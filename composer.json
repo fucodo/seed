@@ -1,0 +1,19 @@
+{
+    "description": "Command to seed a database and or lateron files with initial data.",
+    "type": "neos-package",
+    "name": "fucodo/seed",
+    "require": {
+        "neos/flow": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "fucodo\\seed\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "fucodo.seed"
+        }
+    },
+    "license": "MIT"
+}
