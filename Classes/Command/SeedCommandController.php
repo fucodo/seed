@@ -99,4 +99,61 @@ class SeedCommandController extends CommandController
 
         return 0;
     }
+
+    /**
+     * Drop all tables in the configured database, ignoring foreign key constraints.
+     * Useful to fully clean up the database before a fresh seed/import.
+     *
+     * Usage: ./flow seed:cleanup
+     *
+     * @return int
+     */
+    public function cleanupCommand(): int
+    {
+        $this->outputLine(TractorService::getCleaningTractor());
+        $this->outputLine('Cleaning up database: dropping all tables (ignoring foreign keys)');
+
+        $this->initializeConnection();
+        $this->outputLine('Database connection established');
+
+        $schemaManager = $this->connection->getDriver()->getSchemaManager($this->connection);
+        $platformName = $this->connection->getDatabasePlatform()->getName() ?? '';
+
+        // Try to disable foreign key checks for engines that support it (e.g., MySQL)
+        try {
+            if ($platformName === 'mysql') {
+                $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
+            }
+        } catch (\Throwable $e) {
+            // Best-effort: continue even if we cannot disable FK checks
+        }
+
+        // Drop all tables
+        $tables = $schemaManager->listTableNames();
+
+        $this->outputLine('Getting Schema Data');
+
+        foreach ($tables as $tableName) {
+            $this->output('- Dropping: ' . $tableName);
+            try {
+                $this->connection->executeStatement('DROP TABLE IF EXISTS ' . $this->connection->quoteIdentifier($tableName));
+                $this->outputLine(' - [DONE]');
+            } catch (\Throwable $e) {
+                $this->outputLine(' - [FAILED] ' . $e->getMessage());
+            }
+        }
+
+        // Re-enable foreign key checks when possible
+        try {
+            if ($platformName === 'mysql') {
+                $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
+            }
+        } catch (\Throwable $e) {
+            // Ignore
+        }
+
+
+        $this->outputLine('Database cleanup finished');
+        return 0;
+    }
 }

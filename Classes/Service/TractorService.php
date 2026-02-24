@@ -4,14 +4,23 @@ namespace fucodo\seed\Service;
 
 class TractorService {
 
-    const TRACTOR = '
-                __
-      ______   |  |      *   *   *   (seeds)
-     /|_||_\`.__|  |
-    (   _    _ _  |
-    =`-(_)--(_)-`';
+    const TRACTOR_SEEDING = '
+          _____
+         /|_||_\\`---.
+        (   _    _ _ \\      *   *   *   (seeds)
+        =`-(_)--(_)-`';
+
+    const TRACTOR_CLEANING = '
+               |
+          _____|_____
+         [___________]
+          (o)     (o)      .   .   .   (cleaned)';
 
     public static function getTractor() {
-        return self::TRACTOR;
+        return self::TRACTOR_SEEDING;
+    }
+
+    public static function getCleaningTractor() {
+        return self::TRACTOR_CLEANING;
     }
 }
