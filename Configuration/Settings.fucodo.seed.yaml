@@ -6,4 +6,8 @@
 #         databaseImports:
 #           100:
 #             file: 'resource://fucodo.seed/Seed/000-examplefile.sql'
-#
+#         commands:
+#           100:
+#             command: ./flow help
+#             arguments:
+#               test: 1

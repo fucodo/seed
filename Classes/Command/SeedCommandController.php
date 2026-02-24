@@ -13,6 +13,7 @@ use fucodo\seed\Service\TractorService;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Cli\CommandController;
 use Neos\Flow\Cli\Exception\StopCommandException;
+use Neos\Flow\Core\Booting\Scripts;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\Persistence\Doctrine\Service as DoctrineService;
 use Neos\Utility\ObjectAccess;
@@ -44,6 +45,12 @@ class SeedCommandController extends CommandController
      * @var array
      */
     protected $settings = [];
+
+    /**
+     * @Flow\InjectConfiguration(package="Neos.Flow")
+     * @var array
+     */
+    protected array $flowSettings;
 
     /**
      * Create a Doctrine DBAL Connection with the configured settings.
@@ -96,6 +103,31 @@ class SeedCommandController extends CommandController
         }
 
         $this->outputLine('Runnings commands');
+
+        foreach ($this->settings[$job]['commands'] as $command) {
+            $this->outputLine(
+                sprintf(
+                    '✔ Running command: %s with arguments: %s',
+                    $command['command'],
+                    json_encode($command['arguments'] ?? [], JSON_THROW_ON_ERROR)
+                )
+            );
+
+            if (str_starts_with($command['command'], './flow ')) {
+                $commandIdentifier = substr($command['command'], 7);
+                Scripts::executeCommand(
+                    $commandIdentifier,
+                    $this->flowSettings, // needs global flow settings
+                    true,
+                    $command['arguments'] ?? [] // arguments
+                );
+                $this->outputLine(' - [DONE]');
+            } else {
+                $this->outputLine(' - [Skipped]');
+            }
+
+
+        }
 
         return 0;
     }
